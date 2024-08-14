@@ -55,25 +55,26 @@ export const register = async (req, res) => {
   
       // GENERATE COOKIE TOKEN AND SEND TO THE USER
 
-    
-  
-      // res.setHeader("Set-Cookie", "test=" + "myValue").json("success")
-
       const age = 1000 * 60 * 60 * 24 * 7;
 
-      console.log("JWT_SECRET_KEY", JWT_SECRET_KEY);
-      
+      const token = jwt.sign(
+        {
+          id: user.id,
+          isAdmin: false,
+        },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: age }
+      );
 
-    //   const token = jwt.sign(
-    //     {
-    //       id: user.id,
-    //       isAdmin: false,
-    //     },
-    //     process.env.JWT_SECRET_KEY,
-    //     { expiresIn: age }
-    //   );
-
-      return res.status(201).json({ message: "User successfully login" });
+      const { password: userPassword, ...userInfo } = user;
+      res
+      .cookie("token", token, {
+        httpOnly: true,
+        // secure:true,
+        maxAge: age,
+      })
+      .status(200)
+      .json(userInfo);
 
     } catch (err) {
     
